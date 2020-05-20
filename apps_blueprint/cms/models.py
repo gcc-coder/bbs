@@ -19,10 +19,11 @@ class CMSUser(db.Model):
     email = db.Column(db.String(60), nullable=True)
     regist_time = db.Column(db.DateTime, default=datetime.now)
 
-    def __init__(self, username, password, email):
-        self.username = username
-        self.password = password
-        self.email = email
+    # 由manage下的create_cms_user传参
+    # def __init__(self, username, password, email):
+    #     self.username = username
+    #     self.password = password
+    #     self.email = email
 
     @property
     # 上面init中的self.password等于此方法
