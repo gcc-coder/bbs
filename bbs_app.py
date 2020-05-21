@@ -14,6 +14,7 @@ from exts import db
 from apps_blueprint.cms.views import cms_bp
 from apps_blueprint.common.views import common_bp
 from apps_blueprint.front.views import front_bp
+from flask_wtf import CSRFProtect
 
 """【目录结构】
 cms - 后台
@@ -22,6 +23,9 @@ front - 前台
 """
 
 app = Flask(__name__)
+"""CSRFProtect保护网站：验证是否为爬虫或浏览器"""
+CSRFProtect(app)    # CSRF可生成随机字符串，用于验证
+
 app.config.from_object(config)
 db.init_app(app)
 app.register_blueprint(cms_bp)
