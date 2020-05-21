@@ -9,8 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
-
-    <title>登录论坛系统</title>
+    <title>登录管理页面</title>
 
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -23,7 +22,6 @@
   </head>
 
   <body>
-
     <div class="container">
       <form class="form-signin" method="post">
         <h2 class="form-signin-heading" align="center">请您登录</h2>
@@ -33,15 +31,16 @@
         <input type="password" id="inputPassword" class="form-control" name="password" placeholder="请输入登录密码" required>
         <div class="checkbox">
           <label>
-            <input type="checkbox" value="remember-me" name="remember"> 记住我
+            <input type="checkbox" value="1" name="remember"> 记住我
           </label>
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
       </form>
+      {% if message %}
+        <p style="text-align: center" class="text-danger">{{ message }}</p>
+      {% endif %}
 
     </div> <!-- /container -->
-
-
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
   </body>

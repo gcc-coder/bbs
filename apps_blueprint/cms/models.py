@@ -19,11 +19,11 @@ class CMSUser(db.Model):
     email = db.Column(db.String(60), nullable=True)
     regist_time = db.Column(db.DateTime, default=datetime.now)
 
-    # 由manage下的create_cms_user传参
-    # def __init__(self, username, password, email):
-    #     self.username = username
-    #     self.password = password
-    #     self.email = email
+    # 由manage下的create_cms_user传参过来
+    def __init__(self, username, password, email):
+        self.username = username
+        self.password = password
+        self.email = email
 
     @property
     # 上面init中的self.password等于此方法
@@ -34,3 +34,9 @@ class CMSUser(db.Model):
     # 加密password
     def password(self, raw_password):
         self._password = generate_password_hash(raw_password)
+
+    """检查密码"""
+    def check_password(self, raw_password):
+        # self.password为数据库存储的加密密码，raw_password为表单提交的密码
+        res = check_password_hash(self.password, raw_password)
+        return res
