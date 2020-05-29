@@ -8,11 +8,12 @@
 @Software: PyCharm
 @Description:
 """
-from flask import request, redirect, url_for, session
+from flask import request, redirect, url_for, session, g
 from .views import cms_bp
+from .views import CMSUser
 
 """判断访问的url是否为login，若否，则跳转至login_url"""
-@cms_bp.before_request  # 钩子函数
+@cms_bp.before_request  # 钩子函数,在每次请求之前都会执行
 def before_request():
     # print(request.url, request.path)
     login_url = request.url.endswith(url_for('cms.login'))  # 返回布尔值
@@ -21,3 +22,10 @@ def before_request():
         user_id = session.get('user_id')
         if not user_id:
             return redirect(url_for('cms.login'))
+
+    if 'user_id' in  session:
+        user = session.get('user_name')
+        # user_id = CMSUser.query.get('user_id')
+        # user =
+        if user:
+            g.cms_user = user

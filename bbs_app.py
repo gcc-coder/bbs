@@ -23,7 +23,7 @@ front - 前台
 """
 
 app = Flask(__name__)
-"""CSRFProtect保护网站：验证是否为爬虫或浏览器"""
+"""CSRFProtect用于保护网站：验证访问者是否为爬虫或含有csrf字符串的浏览器"""
 CSRFProtect(app)    # CSRF可生成随机字符串，用于验证
 
 app.config.from_object(config)
