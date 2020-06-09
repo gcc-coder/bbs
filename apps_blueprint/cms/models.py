@@ -22,7 +22,7 @@ class CMSUser(db.Model):
     # 由manage下的create_cms_user传参过来
     def __init__(self, username, password, email):
         self.username = username
-        self.password = password
+        self.password = password    # 值password调用@password.setter中的加密方法
         self.email = email
 
     @property

@@ -24,8 +24,10 @@ def before_request():
             return redirect(url_for('cms.login'))
 
     if 'user_id' in  session:
-        user = session.get('user_name')
-        # user_id = CMSUser.query.get('user_id')
-        # user =
+        # 若未定义session的user_name时，通过id取cmsuser
+        id = session.get('user_id')
+        user = CMSUser.query.get(id)
+        # 需先定义session的user_name，才能直接进行取值
+        # user = session.get('user_name')
         if user:
-            g.cms_user = user
+            g.cms_user = user   # 将取到的值赋值给g对象
