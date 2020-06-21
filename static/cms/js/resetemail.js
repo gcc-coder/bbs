@@ -28,7 +28,7 @@ $(function () {
         event.preventDefault();
         var email = $("input[name='email']").val();
         if(!email){
-            lgalert.alertInfoToast('请输入邮箱');
+            lgalert.alertInfoToast('请输入要修改的邮箱地址');
             return;
         }
         var lgajax = {

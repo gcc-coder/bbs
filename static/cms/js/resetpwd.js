@@ -50,10 +50,22 @@ $(function () {
                 'confirm_pwd': confirm_pwd
             },
             'success': function (data) {
-                console.log(data);
+                // console.log(data);
+                // 进行弹窗提示
+                if(data['code'] == 200){
+                    lgalert.alertSuccess('密码修改成功');
+                    // 清空文本框内的密码信息
+                    oldpwd.val('');
+                    newpwd.val('');
+                    confirm_pwd.val('');
+                }else{
+                    var message = data['message'];
+                    lgalert.alertInfo(message);
+                }
             },
             'fail': function (error) {
-                console.log(error);
+                // console.log(error);
+                lgalert.alertNetworkError();
             }
         });
     });

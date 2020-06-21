@@ -19,10 +19,13 @@ from flask import (
     g,
     jsonify
 )
-from apps_blueprint.cms.forms import LoginForm, ResetPwdForm
+from apps_blueprint.cms.forms import LoginForm, ResetPwdForm, CaptchaForm
 from apps_blueprint.cms.models import CMSUser
-from exts import db
+from exts import db, mail
+from utils import restful, email_captcha, cache_redis
+from flask_mail import Message
 # from .decorator import login_required     # 导入钩子函数
+import re
 
 cms_bp = Blueprint('cms', __name__, url_prefix='/cms')
 # 此行需写在cms_bp下面，因为导入的before_request，需要用到cms_bp
@@ -73,8 +76,10 @@ class LoginView(views.MethodView):
                 return self.get(message='邮箱或密码错误')  # 为避免重复使用render，可使用给get传参的方式
         else:
             # return "登录表单验证未通过"
-            msg = login_form.errors.popitem()[1][0]     # popitem()将errors信息转换为元组，再进行取值
-            return self.get(message=msg)
+            # msg = login_form.errors.popitem()[1][0]     # popitem()将errors信息转换为元组，再进行取值
+            # return self.get(message=msg)
+            # 将message抽离后的引入使用
+            return self.get(message=login_form.get_error())
 
 class ResetPasswdView(views.MethodView):
     def get(self):
@@ -91,22 +96,68 @@ class ResetPasswdView(views.MethodView):
                 # 旧密码验证通过后，更新密码
                 user.password = confirm_pwd
                 db.session.commit()
-                return jsonify({"code": 400, "message": "密码修改成功"})
+                # 需给ajax返回json类型的数据格式
+                # return jsonify({"code": 200, "message": "密码修改成功"})
+                return restful.success()    # 调用restful规范
             else:
-                return jsonify({"code": 400, "message": "旧密码错误"})
+                # return jsonify({"code": 400, "message": "旧密码错误"})
+                return restful.bad_request_error(message="旧密码错误")
 
         else:
-            # 需给ajax返回json类型的数据格式
-            message = reset_form.errors.popitem()[1][0]
-            return jsonify({"code": 400, "message": message})
+            # message = reset_form.errors.popitem()[1][0]
+            # return jsonify({"code": 400, "message": message})
+            return restful.bad_request_error(message=reset_form.get_error())    # 调用在forms定义的get_error
 
 class ResetEmailView(views.MethodView):
     def get(self):
         return render_template('cms/cms_resetemail.html')
 
     def post(self):
-        pass
+        form = CaptchaForm(request.form)
+        if form.validate():
+            email = form.email.data     # 表单提交的email
+            # 查询数据库
+            # res = CMSUser.query.filter_by(email=email).first()
+
+            g.cms_user.email = email
+            print(g.cms_user.email)
+            db.session.commit()
+            return restful.success()
+        else:
+            return restful.unauthor_error(form.get_error())
+
+# 测试发送邮件
+@cms_bp.route('/sendmail/')
+def sendmail():
+    msg = Message("Hello",
+                  recipients=["1520128856@qq.com"],
+                  body="邮件发送测试")
+    mail.send(msg)
+    return "邮件已发送！"
+
+# 定义发送验证码邮件类视图
+class EmailCaptcha(views.MethodView):
+    def get(self):      # 对应ajax，此处仅用get
+        email = request.args.get('email')
+        # 验证邮箱地址是否合法
+        pattern = re.compile(r'^[0-9a-zA-Z_]{5,19}@[0-9a-zA-Z]{1,13}\.')
+        # 使用re库的match方法校验传入的邮箱参数是否合理,是否与表达式匹配
+        if re.match(pattern, email) is not None:
+        # if pattern.match(email):
+            # 发送验证码邮件
+            captcha = email_captcha.generate_code(4)
+            msg = Message("cms验证码邮件", recipients=[email], body="您的验证码是：%s" % captcha)
+            try:
+                mail.send(msg)
+            except:
+                return restful.server_error()
+            # 存储验证码到Redis，以及设置验证码过期时间
+            cache_redis.captcha_set(email, captcha)
+            return restful.success()
+        else:
+            return restful.bad_request_error("邮箱地址错误")
 
 cms_bp.add_url_rule('/login/', view_func=LoginView.as_view('login'))
 cms_bp.add_url_rule('/resetpwd/', view_func=ResetPasswdView.as_view('resetpwd'))
 cms_bp.add_url_rule('/resetemail/', view_func=ResetEmailView.as_view('resetemail'))
+cms_bp.add_url_rule('/email_captcha/', view_func=EmailCaptcha.as_view('email_captcha'))

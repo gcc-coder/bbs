@@ -9,6 +9,10 @@
     <script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='cms/css/cms_base.css') }}">
     <script src="{{ url_for('static', filename='cms/js/cms_base.js') }}"></script>
+    <!-- 修改密码相关弹框提示 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='common/sweetalert/sweetalert.css') }}">
+    <script src="{{ url_for('static', filename='common/sweetalert/lgalert.js') }}"></script>
+    <script src="{{ url_for('static', filename='common/sweetalert/sweetalert.min.js') }}"></script>
     {% block header %}
     {% endblock %}
 </head>

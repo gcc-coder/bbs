@@ -10,7 +10,7 @@
 """
 from flask import Flask
 import config
-from exts import db
+from exts import db, mail
 from apps_blueprint.cms.views import cms_bp
 from apps_blueprint.common.views import common_bp
 from apps_blueprint.front.views import front_bp
@@ -28,6 +28,8 @@ CSRFProtect(app)    # CSRF可生成随机字符串，用于验证
 
 app.config.from_object(config)
 db.init_app(app)
+mail.init_app(app)
+
 app.register_blueprint(cms_bp)
 app.register_blueprint(common_bp)
 app.register_blueprint(front_bp)
