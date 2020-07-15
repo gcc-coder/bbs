@@ -184,7 +184,6 @@ body {
 }
 
 
-
 .top-group{
     padding: 5px 10px;
     border-radius: 2px;
@@ -194,4 +193,8 @@ body {
 
 .form-container {
     width: 300px;
+}
+
+.table {
+    width: 500px;
 }

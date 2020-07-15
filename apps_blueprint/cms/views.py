@@ -20,11 +20,11 @@ from flask import (
     jsonify
 )
 from apps_blueprint.cms.forms import LoginForm, ResetPwdForm, CaptchaForm
-from apps_blueprint.cms.models import CMSUser
+from apps_blueprint.cms.models import CMSUser, CMSPermission
 from exts import db, mail
 from utils import restful, email_captcha, cache_redis
 from flask_mail import Message
-# from .decorator import login_required     # 导入钩子函数
+from .decorator import login_required, permission_required
 import re
 
 cms_bp = Blueprint('cms', __name__, url_prefix='/cms')
@@ -156,6 +156,34 @@ class EmailCaptcha(views.MethodView):
             return restful.success()
         else:
             return restful.bad_request_error("邮箱地址错误")
+
+
+"""定义后台各板块路由"""
+@cms_bp.route('/posts/')
+@permission_required(CMSPermission.POSTER)
+def posts():
+    return render_template('cms/cms_posts.html')
+
+@cms_bp.route('/boards/')
+@permission_required(CMSPermission.BOADER)
+def boards():
+    return render_template('cms/cms_boards.html')
+
+@cms_bp.route('/fusers/')
+@permission_required(CMSPermission.FRONTER)
+def fusers():
+    return render_template('cms/cms_fusers.html')
+
+@cms_bp.route('/cusers/')
+@permission_required(CMSPermission.BACKER)
+def cusers():
+    return render_template('cms/cms_cusers.html')
+
+@cms_bp.route('/croles/')
+# @permission_required(CMSPermission)
+def croles():
+    return render_template('cms/cms_croles.html')
+
 
 cms_bp.add_url_rule('/login/', view_func=LoginView.as_view('login'))
 cms_bp.add_url_rule('/resetpwd/', view_func=ResetPasswdView.as_view('resetpwd'))

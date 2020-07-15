@@ -3,11 +3,12 @@
 {% block title %}个人信息{% endblock %}
 
 {% block header %}
-    <style>
-        .table {
-            width: 500px;
-        }
-    </style>
+<!--已将.form-container放置cms_base.css中-->
+<!--    <style>-->
+<!--        .table {-->
+<!--            width: 500px;-->
+<!--        }-->
+<!--    </style>-->
 {% endblock %}
 
 {% block page %}
@@ -16,7 +17,7 @@
 
 {% block content %}
     <table class="table table-bordered">
-        {% set user=g.cms_user%}
+        {% set user = g.cms_user%}
         <!--<tbody>-->
             <tr>
                 <td>用户名：</td>
@@ -28,11 +29,27 @@
             </tr>
             <tr>
                 <td>角色：</td>
-                <td>暂未实现</td>
+                <td>
+                    <!--显示当前登录邮箱的所属角色-->
+                    {% for role in user.roles %}
+                        {{ role.role_name }}
+                        <!--除了最后一次循环，都加上逗号-->
+                        {% if not loop.last %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </td>
             </tr>
             <tr>
                 <td>权限：</td>
-                <td>暂未实现</td>
+                <td>
+                    {% for role in user.roles %}
+                        {{ role.desc }}
+                        {% if not loop.last %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </td>
             </tr>
             <tr>
                 <td>加入时间：</td>

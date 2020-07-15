@@ -10,7 +10,7 @@
 """
 from flask import request, redirect, url_for, session, g
 from .views import cms_bp
-from .views import CMSUser
+from .models import CMSUser, CMSPermission
 
 """判断访问的url是否为login，若否，则跳转至login_url"""
 @cms_bp.before_request  # 钩子函数,在每次请求之前都会执行
@@ -23,7 +23,7 @@ def before_request():
         if not user_id:
             return redirect(url_for('cms.login'))
 
-    if 'user_id' in  session:
+    if 'user_id' in session:
         # 若未定义session的user_name时，通过id取cmsuser
         id = session.get('user_id')
         user = CMSUser.query.get(id)
@@ -31,3 +31,8 @@ def before_request():
         # user = session.get('user_name')
         if user:
             g.cms_user = user   # 将取到的值赋值给g对象
+
+# 此上下文管理器作用是 可以在模板中使用CMSPermission
+@cms_bp.context_processor
+def cms_bp_context_processor():
+    return {'CMSPermission': CMSPermission}
